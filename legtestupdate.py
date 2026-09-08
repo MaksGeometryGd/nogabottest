@@ -2259,6 +2259,12 @@ ADMIN_GIVE_REBIRTH_RE = re.compile(rf"^!дать очкп {AMOUNT}(\s+себе)?
 ADMIN_TAKE_REBIRTH_RE = re.compile(rf"^!снять очкп (?:{AMOUNT}|все)(\s+себе)?$", re.IGNORECASE)
 ADMIN_GIVE_CRAFT_RE = re.compile(rf"^!дать (?:крафт|очкк) {AMOUNT}(\s+себе)?$", re.IGNORECASE)
 ADMIN_TAKE_CRAFT_RE = re.compile(rf"^!снять (?:крафт|очкк) (?:{AMOUNT}|все)(\s+себе)?$", re.IGNORECASE)
+ADMIN_GIVE_GOLD_COIN_RE = re.compile(rf"^!дать (?:гкоин|голдкоин) {AMOUNT}(\s+себе)?$", re.IGNORECASE)
+ADMIN_TAKE_GOLD_COIN_RE = re.compile(rf"^!снять (?:гкоин|голдкоин) (?:{AMOUNT}|все)(\s+себе)?$", re.IGNORECASE)
+ADMIN_GIVE_DIAMOND_COIN_RE = re.compile(rf"^!дать (?:акоин|алмкоин|алмазкоин) {AMOUNT}(\s+себе)?$", re.IGNORECASE)
+ADMIN_TAKE_DIAMOND_COIN_RE = re.compile(rf"^!снять (?:акоин|алмкоин|алмазкоин) (?:{AMOUNT}|все)(\s+себе)?$", re.IGNORECASE)
+ADMIN_GIVE_PRESTIGE_RE = re.compile(rf"^!дать престиж {AMOUNT}(\s+себе)?$", re.IGNORECASE)
+ADMIN_TAKE_PRESTIGE_RE = re.compile(rf"^!снять престиж (?:{AMOUNT}|все)(\s+себе)?$", re.IGNORECASE)
 ADMIN_GIVE_LEGS_LVL_RE = re.compile(r"^!дать ноги лвл(\d+)(\s+себе)?$", re.IGNORECASE)
 
 PEER_GIVE_LEGS_RE = re.compile(rf"^дать ног {AMOUNT}$", re.IGNORECASE)
@@ -2334,6 +2340,7 @@ PREFIX_COMMANDS = (
     "!дать коин", "!снять коин", "!дать б", "!снять б", "!дать п", "!снять п", "!дать вип", "!снять вип", "!сбросить",
     "передать ", "дать ", "кейс ", NEWS_PREFIX, "инфо ", "продать",
     "!дать очкп", "!снять очкп", "!дать крафт", "открыть кейс", "осмотреть кейс", "осмотр кейс", "крафты ", "крафт ", "уничтожение",
+    "!дать гкоин", "!снять гкоин", "!дать акоин", "!снять акоин", "!дать престиж", "!снять престиж",
     "+ник ", "!установить ног", "!установить эво",
     "!сброс кд", "!сброс бонус", "!дать кейс", "!дебаг ", "!текст ", "!симулировать эволюция", "!ивент х",
     "!установить очкп", "!обнулить экономику", "!мультипликатор ферма", "!дать предмет",
@@ -9273,6 +9280,181 @@ async def admin_take_craft(message: Message):
     new_points = max(0, row[32] - amount)
     await db_exec("UPDATE users SET craft_points = ? WHERE user_id = ?", (new_points, target.id))
     await message.reply(f"Снято {amount} 💠 очков крафта у игрока {esc(target_username)} (Осталось: {new_points})")
+
+@dp.message(F.text.regexp(r"(?i)^!дать (?:гкоин|голдкоин)\b"))
+async def admin_give_gold_coin(message: Message):
+    if not is_admin(message):
+        return
+    await log_admin_action(message)
+    match = ADMIN_GIVE_GOLD_COIN_RE.match(message.text.strip())
+    if not match:
+        await message.reply("Формат: !дать гкоин <количество> [себе] (в ответ на сообщение игрока). Алиас: !дать голдкоин")
+        return
+
+    target = await resolve_target(message, bool(match.group(2)))
+    if not target:
+        await message.reply("Ответь этой командой на сообщение игрока, либо допиши «себе».")
+        return
+
+    amount = parse_amount(match.group(1))
+    if not amount or amount <= 0:
+        await message.reply("Некорректное количество.")
+        return
+    target_username = target.username or target.first_name or "Без имени"
+
+    await ensure_user(target.id, target_username)
+    gc_row = await db_query_one("SELECT gold_coin FROM users WHERE user_id = ?", (target.id,))
+    new_amount = (gc_row[0] if gc_row else 0) + amount
+    await db_exec("UPDATE users SET gold_coin = ? WHERE user_id = ?", (new_amount, target.id))
+    await message.reply(f"Выдано {amount} 🌕 гкоин игроку {esc(target_username)} (Всего: {new_amount})")
+
+@dp.message(F.text.regexp(r"(?i)^!снять (?:гкоин|голдкоин)\b"))
+async def admin_take_gold_coin(message: Message):
+    if not is_admin(message):
+        return
+    await log_admin_action(message)
+    match = ADMIN_TAKE_GOLD_COIN_RE.match(message.text.strip())
+    if not match:
+        await message.reply("Формат: !снять гкоин <количество|все> [себе] (в ответ на сообщение игрока). Алиас: !снять голдкоин")
+        return
+
+    target = await resolve_target(message, bool(match.group(2)))
+    if not target:
+        await message.reply("Ответь этой командой на сообщение игрока, либо допиши «себе».")
+        return
+    target_username = target.username or target.first_name or "Без имени"
+    await ensure_user(target.id, target_username)
+
+    if match.group(1) is None:
+        await db_exec("UPDATE users SET gold_coin = 0 WHERE user_id = ?", (target.id,))
+        await message.reply(f"Снято все 🌕 гкоин у игрока {esc(target_username)} (Осталось: 0)")
+        return
+
+    amount = parse_amount(match.group(1))
+    if not amount or amount <= 0:
+        await message.reply("Некорректное количество.")
+        return
+
+    gc_row = await db_query_one("SELECT gold_coin FROM users WHERE user_id = ?", (target.id,))
+    new_amount = max(0, (gc_row[0] if gc_row else 0) - amount)
+    await db_exec("UPDATE users SET gold_coin = ? WHERE user_id = ?", (new_amount, target.id))
+    await message.reply(f"Снято {amount} 🌕 гкоин у игрока {esc(target_username)} (Осталось: {new_amount})")
+
+@dp.message(F.text.regexp(r"(?i)^!дать (?:акоин|алмкоин|алмазкоин)\b"))
+async def admin_give_diamond_coin(message: Message):
+    if not is_admin(message):
+        return
+    await log_admin_action(message)
+    match = ADMIN_GIVE_DIAMOND_COIN_RE.match(message.text.strip())
+    if not match:
+        await message.reply("Формат: !дать акоин <количество> [себе] (в ответ на сообщение игрока). Алиасы: !дать алмкоин, !дать алмазкоин")
+        return
+
+    target = await resolve_target(message, bool(match.group(2)))
+    if not target:
+        await message.reply("Ответь этой командой на сообщение игрока, либо допиши «себе».")
+        return
+
+    amount = parse_amount(match.group(1))
+    if not amount or amount <= 0:
+        await message.reply("Некорректное количество.")
+        return
+    target_username = target.username or target.first_name or "Без имени"
+
+    await ensure_user(target.id, target_username)
+    dc_row = await db_query_one("SELECT diamond_coin FROM users WHERE user_id = ?", (target.id,))
+    new_amount = (dc_row[0] if dc_row else 0) + amount
+    await db_exec("UPDATE users SET diamond_coin = ? WHERE user_id = ?", (new_amount, target.id))
+    await message.reply(f"Выдано {amount} 💎 акоин игроку {esc(target_username)} (Всего: {new_amount})")
+
+@dp.message(F.text.regexp(r"(?i)^!снять (?:акоин|алмкоин|алмазкоин)\b"))
+async def admin_take_diamond_coin(message: Message):
+    if not is_admin(message):
+        return
+    await log_admin_action(message)
+    match = ADMIN_TAKE_DIAMOND_COIN_RE.match(message.text.strip())
+    if not match:
+        await message.reply("Формат: !снять акоин <количество|все> [себе] (в ответ на сообщение игрока). Алиасы: !снять алмкоин, !снять алмазкоин")
+        return
+
+    target = await resolve_target(message, bool(match.group(2)))
+    if not target:
+        await message.reply("Ответь этой командой на сообщение игрока, либо допиши «себе».")
+        return
+    target_username = target.username or target.first_name or "Без имени"
+    await ensure_user(target.id, target_username)
+
+    if match.group(1) is None:
+        await db_exec("UPDATE users SET diamond_coin = 0 WHERE user_id = ?", (target.id,))
+        await message.reply(f"Снято все 💎 акоин у игрока {esc(target_username)} (Осталось: 0)")
+        return
+
+    amount = parse_amount(match.group(1))
+    if not amount or amount <= 0:
+        await message.reply("Некорректное количество.")
+        return
+
+    dc_row = await db_query_one("SELECT diamond_coin FROM users WHERE user_id = ?", (target.id,))
+    new_amount = max(0, (dc_row[0] if dc_row else 0) - amount)
+    await db_exec("UPDATE users SET diamond_coin = ? WHERE user_id = ?", (new_amount, target.id))
+    await message.reply(f"Снято {amount} 💎 акоин у игрока {esc(target_username)} (Осталось: {new_amount})")
+
+@dp.message(F.text.regexp(r"(?i)^!дать престиж\b"))
+async def admin_give_prestige(message: Message):
+    if not is_admin(message):
+        return
+    await log_admin_action(message)
+    match = ADMIN_GIVE_PRESTIGE_RE.match(message.text.strip())
+    if not match:
+        await message.reply("Формат: !дать престиж <количество> [себе] (в ответ на сообщение игрока)")
+        return
+
+    target = await resolve_target(message, bool(match.group(2)))
+    if not target:
+        await message.reply("Ответь этой командой на сообщение игрока, либо допиши «себе».")
+        return
+
+    amount = parse_amount(match.group(1))
+    if not amount or amount <= 0:
+        await message.reply("Некорректное количество.")
+        return
+    target_username = target.username or target.first_name or "Без имени"
+
+    row = await ensure_user(target.id, target_username)
+    new_points = row[27] + amount
+    await db_exec("UPDATE users SET prestige_points = ? WHERE user_id = ?", (new_points, target.id))
+    await message.reply(f"Выдано {amount} 🔮 престижа игроку {esc(target_username)} (Всего: {new_points})")
+
+@dp.message(F.text.regexp(r"(?i)^!снять престиж\b"))
+async def admin_take_prestige(message: Message):
+    if not is_admin(message):
+        return
+    await log_admin_action(message)
+    match = ADMIN_TAKE_PRESTIGE_RE.match(message.text.strip())
+    if not match:
+        await message.reply("Формат: !снять престиж <количество|все> [себе] (в ответ на сообщение игрока)")
+        return
+
+    target = await resolve_target(message, bool(match.group(2)))
+    if not target:
+        await message.reply("Ответь этой командой на сообщение игрока, либо допиши «себе».")
+        return
+    target_username = target.username or target.first_name or "Без имени"
+
+    row = await ensure_user(target.id, target_username)
+    if match.group(1) is None:
+        await db_exec("UPDATE users SET prestige_points = 0 WHERE user_id = ?", (target.id,))
+        await message.reply(f"Снято все 🔮 престижа у игрока {esc(target_username)} (Осталось: 0)")
+        return
+
+    amount = parse_amount(match.group(1))
+    if not amount or amount <= 0:
+        await message.reply("Некорректное количество.")
+        return
+
+    new_points = max(0, row[27] - amount)
+    await db_exec("UPDATE users SET prestige_points = ? WHERE user_id = ?", (new_points, target.id))
+    await message.reply(f"Снято {amount} 🔮 престижа у игрока {esc(target_username)} (Осталось: {new_points})")
 
 @dp.message(F.text.lower().startswith("!снять очкп"))
 async def admin_take_rebirth(message: Message):
