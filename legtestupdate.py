@@ -6080,7 +6080,7 @@ async def my_profile(message: Message):
     if is_developer_id(user_id):
         titles.add("developer")
     display_title = get_display_title(titles)
-    title_line = f"● Титул: {title_emoji_badge(display_title)} {esc(TITLE_LABELS[display_title])}\n" if display_title != "player" else ""
+    title_line = f"● Титул: {title_emoji_badge(display_title)}\n" if display_title != "player" else ""
 
     if vip_active:
         left = vip_until - now
@@ -6095,8 +6095,6 @@ async def my_profile(message: Message):
     guarant_line = f"● Гарант-буст с предмета: +{flat_bonus} к итогу\n" if flat_bonus else ""
     rebirth_line = f"● Перерождений: {rebirth_count} (🉑 {rebirth_points}) (💠 {craft_points})\n" if rebirth_count else ""
     ultra_line = "🌌 <b>Статус: После Ультра перерождения</b>\n" if ultra_rebirth else ""
-    equipped_names = [ITEMS[k][1] for k in (active_items) if k and k in ITEMS]
-    equip_line = ("● Экипировано:\n" + "\n".join(f"  {n}" for n in equipped_names) + "\n") if equipped_names else ""
     premium_coins_line = (
         f"● Голд коин: <code>{gold_coin}</code> 🌕 · Алмаз коин: <code>{diamond_coin}</code> 💎\n"
         if (gold_coin or diamond_coin) else ""
@@ -6143,7 +6141,6 @@ async def my_profile(message: Message):
         f"{lvl_line}"
         f"● Уровень эволюции: {evolution_level}\n"
         f"{rebirth_line}"
-        f"{equip_line}"
         f"● Процентовый буст: +{round((mult - 1) * 100)}%\n"
         f"{guarant_line}"
         f"{vip_line}"
@@ -6206,7 +6203,7 @@ async def info_player(message: Message):
     if is_developer_id(row[0]):
         titles.add("developer")
     display_title = get_display_title(titles)
-    title_line = f"● Титул: {title_emoji_badge(display_title)} {esc(TITLE_LABELS[display_title])}\n" if display_title != "player" else ""
+    title_line = f"● Титул: {title_emoji_badge(display_title)}\n" if display_title != "player" else ""
 
     rebirth_line = f"● Перерождений: {rebirth_count} (🉑 {rebirth_points}) (💠 {craft_points})\n" if rebirth_count else ""
 
