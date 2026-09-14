@@ -2615,6 +2615,12 @@ def normalize_alias_fuzzy(text: str) -> str:
     stripped = text.strip()
     if not stripped or " " in stripped:
         return text
+    # Команды контент-мейкеров (?сброс/?буст/?ускорение/?бонус/?хелп) — отдельное пространство
+    # имён, начинающееся с "?". Не подгонять их fuzzy-совпадением к обычным словам вроде "бонус"
+    # (расстояние Левенштейна между "?бонус" и "бонус" — всего 1, что укладывалось в
+    # _FUZZY_MAX_DIST и приводило к слиянию этих разных команд).
+    if stripped.startswith("?"):
+        return text
     lowered = stripped.lower()
     if lowered in FIXED_COMMANDS or lowered in ALIAS_PHRASES:
         return text
