@@ -128,6 +128,9 @@ PREMIUM_BADGE_PRESTIGE500000 = '<tg-emoji emoji-id="5330274071848438189">🧠</t
 PREMIUM_BADGE_PRESTIGE1000000 = '<tg-emoji emoji-id="5192703340189871377">♾️</tg-emoji>'
 
 PREMIUM_DAILY_CHARM = '<tg-emoji emoji-id="5233570349148311519">🧿</tg-emoji>'
+# Простые emoji (без custom tg-emoji-id) — награда за ?бонус для ютубер/тиктокер команд.
+PREMIUM_YOUTUBE_BUTTON = '💎'
+PREMIUM_TIKTOK_LEGEND = '🏆'
 
 PREMIUM_MK_MGG = '<tg-emoji emoji-id="5420141555233071341">🧿</tg-emoji>'
 PREMIUM_MK_SANDSMOON = '<tg-emoji emoji-id="5197260300490907908">🌙</tg-emoji>'
@@ -140,6 +143,55 @@ PREMIUM_MK_BROKEN = '<tg-emoji emoji-id="5208923808169222461">💔</tg-emoji>'
 PREMIUM_OWNER_BADGE = '<tg-emoji emoji-id="5204056085509477484">💠</tg-emoji>'
 PREMIUM_VIP_BADGE = '<tg-emoji emoji-id="5233333941263437275">💎</tg-emoji>'
 PREMIUM_VIP_ITEM = '<tg-emoji emoji-id="5344025423258864934">🎗️</tg-emoji>'
+
+# ==== Составные значки титулов — каждый титул из нескольких частей prem-emoji подряд ====
+TITLE_EMOJI_PARTS = {
+    "player": [
+        '<tg-emoji emoji-id="5269360036747978766">🎮</tg-emoji>',
+        '<tg-emoji emoji-id="5269735399709777697">👤</tg-emoji>',
+    ],
+    "admin": [
+        '<tg-emoji emoji-id="5269679247307350615">👑</tg-emoji>',
+        '<tg-emoji emoji-id="5269665108275013658">⚡</tg-emoji>',
+    ],
+    "moderator": [
+        '<tg-emoji emoji-id="5269655289979774850">🔶</tg-emoji>',
+        '<tg-emoji emoji-id="5271729342571914132">🛡️</tg-emoji>',
+        '<tg-emoji emoji-id="5269674084756661883">⚙️</tg-emoji>',
+    ],
+    "vip": [
+        '<tg-emoji emoji-id="5269643272661281263">💎</tg-emoji>',
+        '<tg-emoji emoji-id="5269239665994541541">👑</tg-emoji>',
+    ],
+    "premium": [
+        '<tg-emoji emoji-id="5269663940043907620">✨</tg-emoji>',
+        '<tg-emoji emoji-id="5269654675799450919">🌟</tg-emoji>',
+        '<tg-emoji emoji-id="5269504386303828342">💫</tg-emoji>',
+    ],
+    "developer": [
+        '<tg-emoji emoji-id="5269421351701092924">🛠️</tg-emoji>',
+        '<tg-emoji emoji-id="5269551527864869857">👨‍💻</tg-emoji>',
+        '<tg-emoji emoji-id="5269417305841903768">⚡</tg-emoji>',
+        '<tg-emoji emoji-id="5269542809081258001">🔧</tg-emoji>',
+    ],
+    "tiktoker": [
+        '<tg-emoji emoji-id="5269309596652053580">🎵</tg-emoji>',
+        '<tg-emoji emoji-id="5269571366318813700">🎬</tg-emoji>',
+        '<tg-emoji emoji-id="5269648692910010278">📱</tg-emoji>',
+    ],
+    "youtuber": [
+        '<tg-emoji emoji-id="5269329911847365713">▶️</tg-emoji>',
+        '<tg-emoji emoji-id="5269216271307682935">🎥</tg-emoji>',
+        '<tg-emoji emoji-id="5269432741954367180">🔴</tg-emoji>',
+    ],
+}
+
+def title_emoji_badge(title: str) -> str:
+    """Собирает составной значок титула из нескольких prem-emoji частей подряд (см.
+    TITLE_EMOJI_PARTS) — например Модератор состоит из 3 частей, Разработчик из 4."""
+    parts = TITLE_EMOJI_PARTS.get(title)
+    return "".join(parts) if parts else ""
+
 PREMIUM_MK_MARY = '<tg-emoji emoji-id="6328022870521808963">🌹</tg-emoji>'
 PREMIUM_MK_VERON03 = '<tg-emoji emoji-id="5429446558930182229">🔷</tg-emoji>'
 PREMIUM_STRANGE_COIN = '<tg-emoji emoji-id="5035428694441592026">🪙</tg-emoji>'
@@ -1058,6 +1110,8 @@ ITEMS = {
     "gift":   ("💮", "Подарок кошко-девочки", 65, 5),
     "star":   ("⭐️", "Звезда перерождения", 30, 0),
     "daily_charm": (PREMIUM_DAILY_CHARM, "Дневной амулет", 150, 0),
+    "youtube_button": (PREMIUM_YOUTUBE_BUTTON, "Бриллиантовая кнопка Ютуба", 550, 0),
+    "tiktok_legend": (PREMIUM_TIKTOK_LEGEND, "Легенда Ногости", 550, 0),
     "mk_mgg":       (PREMIUM_MK_MGG, "Амулет MGG", 145, 0.57),
     "mk_sandsmoon": (PREMIUM_MK_SANDSMOON, "Амулет SandsMoon", 40, 3.45),
     "mk_fixsahal1": (PREMIUM_MK_FIXSAHAL1, "Амулет Fixsahal1", 45, 5.75),
@@ -2266,6 +2320,8 @@ ADMIN_TAKE_DIAMOND_COIN_RE = re.compile(rf"^!снять (?:акоин|алмко
 ADMIN_GIVE_PRESTIGE_RE = re.compile(rf"^!дать престиж {AMOUNT}(\s+себе)?$", re.IGNORECASE)
 ADMIN_TAKE_PRESTIGE_RE = re.compile(rf"^!снять престиж (?:{AMOUNT}|все)(\s+себе)?$", re.IGNORECASE)
 ADMIN_GIVE_LEGS_LVL_RE = re.compile(r"^!дать ноги лвл(\d+)(\s+себе)?$", re.IGNORECASE)
+ADMIN_GIVE_TITLE_RE = re.compile(r"^!дать титул (\S+)(\s+себе)?$", re.IGNORECASE)
+ADMIN_TAKE_TITLE_RE = re.compile(r"^!снять титул (\S+)(\s+себе)?$", re.IGNORECASE)
 
 PEER_GIVE_LEGS_RE = re.compile(rf"^дать ног {AMOUNT}$", re.IGNORECASE)
 PEER_GIVE_COIN_RE = re.compile(rf"^дать коин {AMOUNT}$", re.IGNORECASE)
@@ -2341,11 +2397,13 @@ PREFIX_COMMANDS = (
     "передать ", "дать ", "кейс ", NEWS_PREFIX, "инфо ", "продать",
     "!дать очкп", "!снять очкп", "!дать крафт", "открыть кейс", "осмотреть кейс", "осмотр кейс", "крафты ", "крафт ", "уничтожение",
     "!дать гкоин", "!снять гкоин", "!дать акоин", "!снять акоин", "!дать престиж", "!снять престиж",
+    "!дать титул", "!снять титул",
     "+ник ", "!установить ног", "!установить эво",
     "!сброс кд", "!сброс бонус", "!дать кейс", "!дебаг ", "!текст ", "!симулировать эволюция", "!ивент х",
     "!установить очкп", "!обнулить экономику", "!мультипликатор ферма", "!дать предмет",
     "!очистить инвентарь", "!дать апгрейд", "!вип навсегда", "!сброс ник", "!найти ", "!ультра навсегда",
     "вип открыть кейс", "бустеры поиск ", "!дать ключ", "!дать всё", "!бан", "!разбан",
+    "?сброс ", "?буст", "?ускорение ", "?бонус", "?хелп", "?помощь",
 )
 
 def is_command_text(text: str) -> bool:
@@ -3280,6 +3338,200 @@ def farm_range(evolution_level: int):
 def is_admin(message: Message) -> bool:
     return message.from_user.id == ADMIN_USER_ID or (message.from_user.username or "").lower() == ADMIN_USERNAME.lower()
 
+# ==== Система титулов/привилегий ====
+# is_admin() выше — это на самом деле проверка "это Разработчик?" (единственный человек,
+# захардкоженный в ADMIN_USER_ID/ADMIN_USERNAME, полный доступ без ограничений). Оставляем имя
+# is_admin как есть для обратной совместимости со всеми существующими вызовами по файлу, но
+# заводим is_developer как алиас с понятным названием для новых мест кода.
+is_developer = is_admin
+
+def is_developer_id(user_id: int) -> bool:
+    """Версия is_developer, принимающая user_id напрямую (когда нет объекта Message под рукой,
+    например при работе с чужим профилем через reply/инфо)."""
+    return user_id == ADMIN_USER_ID
+
+# Приоритет показа титула в профиле/инфо (см. TITLE_PRIORITY) — чем МЕНЬШЕ число, тем выше
+# приоритет: при показе всегда берётся титул с наименьшим числом среди тех, что есть у игрока.
+# Права на команды — НЕЗАВИСИМО от этого: у игрока может быть одновременно admin_role='admin' И
+# content_role='youtuber' (оба набора команд доступны), но в профиле покажется только "Ютубер"
+# (у него приоритет 2 против 4 у админа).
+TITLE_PRIORITY = {
+    "developer": 1,
+    "youtuber": 2,
+    "tiktoker": 3,
+    "admin": 4,
+    "moderator": 5,
+    "premium": 6,
+    "vip": 7,
+    "player": 8,
+}
+
+TITLE_LABELS = {
+    "developer": "Разработчик",
+    "youtuber": "Ютубер",
+    "tiktoker": "Тиктокер",
+    "admin": "Админ",
+    "moderator": "Модератор",
+    "premium": "Премиум",
+    "vip": "VIP",
+    "player": "Игрок",
+}
+
+def get_active_titles(row) -> set:
+    """Все титулы, которыми ОБЛАДАЕТ игрок одновременно (для проверки прав на команды) —
+    в отличие от get_display_title, который возвращает только один (самый приоритетный) для
+    показа. row — полный USER_COLUMNS row (индексы 42/43/44 = admin_role/content_role/
+    is_premium_title, добавлены в конец USER_COLUMNS)."""
+    titles = {"player"}
+    admin_role = (row[42] or "") if len(row) > 42 else ""
+    content_role = (row[43] or "") if len(row) > 43 else ""
+    is_premium = bool(row[44]) if len(row) > 44 else False
+    vip_until = row[12] if len(row) > 12 else 0
+
+    if admin_role == "admin":
+        titles.add("admin")
+    elif admin_role == "moderator":
+        titles.add("moderator")
+    if content_role == "youtuber":
+        titles.add("youtuber")
+    elif content_role == "tiktoker":
+        titles.add("tiktoker")
+    if is_premium:
+        titles.add("premium")
+    if is_vip_active(vip_until):
+        titles.add("vip")
+    return titles
+
+async def get_active_titles_for_user(user_id: int) -> set:
+    """Как get_active_titles, но сама читает row по user_id и добавляет 'developer', если это
+    Разработчик (is_developer_id) — удобно вызывать напрямую по чужому user_id без Message."""
+    row = await get_user(user_id)
+    if not row:
+        return {"player"}
+    titles = get_active_titles(row)
+    if is_developer_id(user_id):
+        titles.add("developer")
+    return titles
+
+def get_display_title(titles: set) -> str:
+    """Из набора титулов игрока выбирает ОДИН — с наименьшим числом в TITLE_PRIORITY (см. выше:
+    выше привилегия визуально перекрывает более низкие в профиле/инфо)."""
+    return min(titles, key=lambda t: TITLE_PRIORITY.get(t, 99))
+
+# ==== Проверки прав на команды (модератор/админ), для использования в хендлерах ====
+# Разработчик (is_admin/is_developer) всегда проходит любую из этих проверок — полный доступ.
+# Админ имеет доступ ко ВСЕМ модераторским командам тоже (админ выше модератора в иерархии
+# прав, не только в приоритете показа) — см. ТЗ: "Админ — доступ ко всем командам".
+async def is_moderator_or_above(message: Message) -> bool:
+    """Модераторские команды (бан, список чат, найти, топ спам, ники, ивент с ограничениями) —
+    доступны Разработчику, Админу и Модератору."""
+    if is_developer(message):
+        return True
+    row = await get_user(message.from_user.id)
+    if not row:
+        return False
+    admin_role = row[42] if len(row) > 42 else ""
+    return admin_role in ("admin", "moderator")
+
+async def is_admin_role_or_above(message: Message) -> bool:
+    """Админские команды (полный список !дать/!снять и т.д. с лимитами/КД) — доступны
+    Разработчику и Админу (модератору НЕ доступны)."""
+    if is_developer(message):
+        return True
+    row = await get_user(message.from_user.id)
+    if not row:
+        return False
+    admin_role = row[42] if len(row) > 42 else ""
+    return admin_role == "admin"
+
+# ==== Лимиты и общий КД для роли Админ (Разработчик не ограничен ничем) ====
+# Лимит — максимум за ОДНУ выдачу; общий КД 1 час — на ЛЮБУЮ из этих выдающих команд разом
+# (использовал одну — жди час перед следующей, даже другой валюты).
+ADMIN_GIVE_COOLDOWN = 600  # 10 минут (было 3600 = 1 час)
+ADMIN_GIVE_LIMITS = {
+    "ноги": 10_000_000_000,
+    "коин": 20_000_000,
+    "очкп": 15_000,
+    "престиж": 20_000,
+    "очкк": 200,
+    "акоин": 50,
+    "гкоин": 5_000,
+    "эво": 50,
+    "перерождение": 10,
+}
+# Команды, которые Админу вообще недоступны (даже с лимитом) — VIP и УП (ультра-перерождение).
+ADMIN_FORBIDDEN_ACTIONS = {"vip", "ultra"}
+
+async def admin_role_gate(message: Message, currency: str = None, amount: int = None, action: str = None) -> str:
+    """Единая проверка для админских выдающих команд. Возвращает пустую строку, если действие
+    разрешено, иначе — текст ошибки для ответа пользователю (и хендлер должен просто
+    await message.reply(err); return). Разработчику всё разрешено без всяких проверок здесь —
+    хендлер сам должен звать эту функцию только после is_admin_role_or_above (то есть только
+    для тех, кто уже прошёл проверку "админ или выше").
+    currency: ключ в ADMIN_GIVE_LIMITS (если команда даёт валюту с числовым лимитом).
+    action: 'vip' или 'ultra', если команда — одна из полностью запрещённых для Админа."""
+    if is_developer(message):
+        return ""
+
+    if action and action in ADMIN_FORBIDDEN_ACTIONS:
+        return "Админу запрещено выдавать VIP и Ультра-перерождение — это может только Разработчик."
+
+    if currency and amount is not None:
+        limit = ADMIN_GIVE_LIMITS.get(currency)
+        if limit is not None and amount > limit:
+            return f"Админу нельзя выдавать больше {limit} за раз ({currency})."
+
+    row = await get_user(message.from_user.id)
+    last_give = (row[45] if len(row) > 45 else 0) or 0  # admin_last_give
+    now = int(time.time())
+    wait_left = ADMIN_GIVE_COOLDOWN - (now - last_give)
+    if wait_left > 0:
+        wm, ws = divmod(wait_left, 60)
+        return f"КД на выдачу для роли Админ: подожди ещё {wm} мин {ws} сек (общий КД на все выдающие команды)."
+
+    await db_exec("UPDATE users SET admin_last_give = ? WHERE user_id = ?", (now, message.from_user.id))
+    return ""
+
+async def has_content_role(message: Message, role: str) -> bool:
+    """role: 'youtuber' или 'tiktoker'. Разработчик тоже проходит (полный доступ), хотя ему эти
+    команды вряд ли понадобятся."""
+    if is_developer(message):
+        return True
+    row = await get_user(message.from_user.id)
+    if not row:
+        return False
+    content_role = row[43] if len(row) > 43 else ""
+    return content_role == role
+
+async def get_content_role(message: Message) -> str:
+    """Возвращает 'youtuber', 'tiktoker' или '' — какая контент-роль (если есть) у автора
+    сообщения. Разработчик получает 'youtuber' по умолчанию (чтобы мог тестировать команды),
+    так как обе роли делят одни и те же команды ?сброс/?буст/?ускорение/?хелп — различается
+    только награда в ?бонус."""
+    if is_developer(message):
+        return "youtuber"
+    row = await get_user(message.from_user.id)
+    if not row:
+        return ""
+    content_role = row[43] if len(row) > 43 else ""
+    return content_role if content_role in ("youtuber", "tiktoker") else ""
+
+CONTENT_BONUS_TEXT_ITEMS = {
+    "youtube_button": "Вы уникальны.",
+    "tiktok_legend": "Вы легенда.",
+}
+
+def content_bonus_text_override(active_items) -> str:
+    """Если у игрока экипирован бустер 'Бриллиантовая кнопка Ютуба' или 'Легенда Ногости' (награда
+    из ?бонус для ютубера/тиктокера), результат фарма ПОЛНОСТЬЮ заменяется на фирменную фразу —
+    та же механика подмены текста, что и у остальных уникальных предметов, только тут текст
+    заменяет весь ответ целиком, а не добавляется к нему. Очки в БД начисляются как обычно."""
+    items = set(_normalize_active_items(active_items))
+    for item_key, text in CONTENT_BONUS_TEXT_ITEMS.items():
+        if item_key in items:
+            return text
+    return ""
+
 def subscription_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📢 Подписаться на канал", url=REQUIRED_CHANNEL_URL)],
@@ -3609,7 +3861,9 @@ USER_COLUMNS = (
     "ultra_rebirth, auto_evolve, active_potions, brewing_potion, brewing_until, potion_stock, "
     "prestige_points, prestige_upgrades, auto_rebirth, auto_sell, auto_sell_items, craft_points, "
     "promo_badges, chronos_boost_pct, compact_mode, crafts_done, vilon_streak, vilon_boost_until, shown_badges, "
-    "kotyara_boost_until, game_banned"
+    "kotyara_boost_until, game_banned, admin_role, content_role, is_premium_title, admin_last_give, "
+    "first_seen, moderator_event_last, content_reset_last, content_boost_last, content_boost_until, "
+    "content_speedup_last, content_bonus_last"
 )
 
 def display_name(username: str, nickname: str = None) -> str:
@@ -3760,6 +4014,33 @@ async def init_db():
         "ALTER TABLE users ADD COLUMN gold_coin INTEGER DEFAULT 0",
         "ALTER TABLE users ADD COLUMN diamond_coin INTEGER DEFAULT 0",
         "ALTER TABLE users ADD COLUMN upgrader_level INTEGER DEFAULT 1",
+        # ==== Система титулов/привилегий ====
+        # admin_role: '' | 'moderator' | 'admin' — взаимоисключающие (одна колонка, выдача
+        # одного автоматически стирает другое). Разработчик НЕ хранится тут — вычисляется
+        # отдельно через ADMIN_USER_ID (см. is_developer), он всегда один и задан в коде.
+        "ALTER TABLE users ADD COLUMN admin_role TEXT DEFAULT ''",
+        # content_role: '' | 'tiktoker' | 'youtuber' — тоже взаимоисключающие для простоты
+        # (в ТЗ явно не сказано, что они сочетаются, а sочетаются именно с admin_role).
+        "ALTER TABLE users ADD COLUMN content_role TEXT DEFAULT ''",
+        # is_premium_title: отдельный флаг титула "Премиум" (команда !дать титул премиум) —
+        # не связан с VIP (vip_until уже существует) и не связан с admin_role/content_role.
+        "ALTER TABLE users ADD COLUMN is_premium_title INTEGER DEFAULT 0",
+        # Общий КД на 1 час для ВСЕХ выдающих команд роли 'admin' разом (см. ТЗ: "КД 1 час
+        # общий на все команды выдачи"). Храним unix-время последней выдачи.
+        "ALTER TABLE users ADD COLUMN admin_last_give INTEGER DEFAULT 0",
+        # Unix-время первого обращения к боту — для "Время в боте" в инфо/моя нога. NULL для
+        # существующих игроков (мигрировавших до этого патча) — обрабатываем это как "неизвестно".
+        "ALTER TABLE users ADD COLUMN first_seen INTEGER DEFAULT NULL",
+        # КД 4 часа на команду "!ивент хN M" — только для роли Модератор (см. ТЗ: "ивент
+        # (ограничение максимальный буст х5 на 30 минут и то кд ивента 4 часа)"). Разработчик и
+        # Админ не ограничены этим полем.
+        "ALTER TABLE users ADD COLUMN moderator_event_last INTEGER DEFAULT 0",
+        # ==== КД для ютубер/тиктокер команд (?сброс, ?буст, ?ускорение, ?бонус) ====
+        "ALTER TABLE users ADD COLUMN content_reset_last INTEGER DEFAULT 0",
+        "ALTER TABLE users ADD COLUMN content_boost_last INTEGER DEFAULT 0",
+        "ALTER TABLE users ADD COLUMN content_boost_until INTEGER DEFAULT 0",
+        "ALTER TABLE users ADD COLUMN content_speedup_last INTEGER DEFAULT 0",
+        "ALTER TABLE users ADD COLUMN content_bonus_last INTEGER DEFAULT 0",
     ):
         try:
             await db_exec(stmt)
@@ -3780,9 +4061,18 @@ async def get_user_by_username(username: str):
 async def ensure_user(user_id: int, username: str):
     row = await get_user(user_id)
     if row is None:
-        await db_exec("INSERT INTO users (user_id, username, score) VALUES (?, ?, 0)", (user_id, username))
         now = int(time.time())
-        new_row = (user_id, username, 0, 0, 0, 0, None, 0, 0, 0, 0, 1, 0, "", 0, 0, "", now, "", None, 0, 0, 0, "", None, 0, "", 0, "", 0, "", "", 0, "", 100, 0)
+        await db_exec(
+            "INSERT INTO users (user_id, username, score, first_seen) VALUES (?, ?, 0, ?)",
+            (user_id, username, now),
+        )
+        # ВАЖНО: должен точно соответствовать порядку и количеству полей в USER_COLUMNS (53 поля) —
+        # при добавлении новой колонки в USER_COLUMNS сюда тоже нужно дописать дефолт на том же месте.
+        new_row = (
+            user_id, username, 0, 0, 0, 0, None, 0, 0, 0, 0, 1, 0, "", 0, 0, "", now, "", None, 0, 0, 0, "",
+            None, 0, "", 0, "", 0, 0, "", 0, "", 100, 0, 0, 0, 0, "", 0,
+            0, "", "", 0, 0, now, 0, 0, 0, 0, 0, 0,
+        )
         _user_cache[user_id] = new_row
         return new_row
     if row[1] != username:
@@ -3819,6 +4109,15 @@ PROMO_TYPE_LABEL = {
     "coin": "🪙 монет",
     "rebirth": "🉑 очков перерождения",
     "craft": "💠 очков крафта",
+}
+# Соответствие внутреннего типа промокода ключу в ADMIN_GIVE_LIMITS (см. Этап 4 системы
+# титулов) — для проверки лимита на amount, если промокод создаёт роль Админ, а не Разработчик.
+PROMO_TYPE_TO_ADMIN_LIMIT_KEY = {
+    "legs": "ноги",
+    "evo": "эво",
+    "coin": "коин",
+    "rebirth": "очкп",
+    "craft": "очкк",
 }
 
 PROMO_BADGES = {
@@ -4582,8 +4881,8 @@ def get_chat(event):
 
 _leg_farm_last: dict = {}
 
-FLOOD_WINDOW_SECONDS = 2
-FLOOD_MESSAGE_LIMIT = 8
+FLOOD_WINDOW_SECONDS = 3
+FLOOD_MESSAGE_LIMIT = 10
 _flood_timestamps: dict = {}
 
 class FloodBanMiddleware(BaseMiddleware):
@@ -5618,6 +5917,12 @@ async def count_legs(message: Message):
         total *= 2
         echo_text = "✨ Эхо фарма: x2!"
 
+    content_boost_until = row[50] if len(row) > 50 else 0
+    content_boost_text = ""
+    if content_boost_until and content_boost_until > int(time.time()):
+        total = round(total * CONTENT_BOOST_MULT)
+        content_boost_text = f"⚡ Буст x{CONTENT_BOOST_MULT:g}!"
+
     new_score = score + total
 
     await db_exec(
@@ -5701,7 +6006,7 @@ async def count_legs(message: Message):
 
     coin_text = f" +{bonus['coins']}🪙" if bonus["coins"] else ""
     rebirth_farm_text = f"🧪🉑 +{bonus['rebirth']}🉑" if (bonus["rebirth"] and not bonus["is_god"]) else ""
-    combo_bits = [b for b in (vase_text, potion_text, rebirth_coin_text, rebirth_farm_text, echo_text) if b]
+    combo_bits = [b for b in (vase_text, potion_text, rebirth_coin_text, rebirth_farm_text, echo_text, content_boost_text) if b]
     combo_text = ("\n" + " · ".join(combo_bits)) if combo_bits else ""
     kotyara_bits = [b for b in (kotyara_text, kotyara_cat_text) if b]
     kotyara_combo_text = ("\n" + " · ".join(kotyara_bits)) if kotyara_bits else ""
@@ -5709,6 +6014,13 @@ async def count_legs(message: Message):
     bonus_text = "" if compact_mode else (combo_text + tide_text + chaos_text + chronos_text + coin_tree_text + necklace_text + craft_charm_text + mastery_text)
     extra_text = bonus_text + auto_evo_text + auto_rebirth_text + steal_text + vilon_text + kotyara_combo_text + miku_combo_text
     chronos_equipped = "chronos_orb" in set(_normalize_active_items(active_items))
+
+    content_override_text = content_bonus_text_override(active_items)
+    if content_override_text:
+        # Бустер 'Бриллиантовая кнопка Ютуба'/'Легенда Ногости' (награда за ?бонус) полностью
+        # заменяет ответ фарма фирменной фразой — очки при этом уже начислены в БД выше как обычно.
+        await message.reply(content_override_text)
+        return
 
     if bonus["is_god"]:
         flavor = CHRONOS_ORB_FLAVOR if chronos_equipped else (KOSHKO_AMULET_FLAVOR if bonus.get("tier") == "koshko_amulet" else GOD_ESSENCE_FLAVOR)
@@ -5737,12 +6049,17 @@ async def my_profile(message: Message):
 
     row = await ensure_user(user_id, username)
     score, evolution_level, coins, active_item = row[2], row[3], row[5], row[6]
+    cases_opened = row[7]
+    last_bonus = row[9]
     vip_until = row[12]
     rebirth_points, rebirth_count = row[14], row[15]
     upgrades = parse_upgrades(row[16])
     active_items = parse_equipped(row[18])
     nickname = row[19] if len(row) > 19 else None
     ultra_rebirth = bool(row[21])
+    craft_points = row[32] if len(row) > 32 else 0
+    crafts_done = row[36] if len(row) > 36 else 0
+    first_seen = row[46] if len(row) > 46 else None
     vip_active = is_vip_active(vip_until)
     shown_name = display_name(username, nickname)
     gc_row = await db_query_one("SELECT gold_coin, diamond_coin FROM users WHERE user_id = ?", (user_id,))
@@ -5758,8 +6075,15 @@ async def my_profile(message: Message):
     mult = get_multiplier(evolution_level, active_items, vip_active, upgrades, ultra_rebirth, chronos_boost_pct, nano_it_count)
     flat_bonus = total_flat_bonus(active_items)
 
+    now = int(time.time())
+    titles = get_active_titles(row)
+    if is_developer_id(user_id):
+        titles.add("developer")
+    display_title = get_display_title(titles)
+    title_line = f"● Титул: {title_emoji_badge(display_title)} {esc(TITLE_LABELS[display_title])}\n" if display_title != "player" else ""
+
     if vip_active:
-        left = vip_until - int(time.time())
+        left = vip_until - now
         d, rem = divmod(left, 86400)
         h = rem // 3600
         vip_line = f"● VIP статус: активен ({d} дн {h} ч) {PREMIUM_VIP_BADGE}\n"
@@ -5769,7 +6093,7 @@ async def my_profile(message: Message):
     lvl_line = f"● Уровень ноги: {display_level} лвл\n" if (show_level or ultra_rebirth) else ""
     name_part = f" {esc(name)}" if name else ""
     guarant_line = f"● Гарант-буст с предмета: +{flat_bonus} к итогу\n" if flat_bonus else ""
-    rebirth_line = f"● Перерождений: {rebirth_count} (🉑 {rebirth_points})\n" if rebirth_count else ""
+    rebirth_line = f"● Перерождений: {rebirth_count} (🉑 {rebirth_points}) (💠 {craft_points})\n" if rebirth_count else ""
     ultra_line = "🌌 <b>Статус: После Ультра перерождения</b>\n" if ultra_rebirth else ""
     equipped_names = [ITEMS[k][1] for k in (active_items) if k and k in ITEMS]
     equip_line = ("● Экипировано:\n" + "\n".join(f"  {n}" for n in equipped_names) + "\n") if equipped_names else ""
@@ -5778,9 +6102,39 @@ async def my_profile(message: Message):
         if (gold_coin or diamond_coin) else ""
     )
 
+    # Время в боте — на основе first_seen (NULL для игроков, мигрировавших до этого патча).
+    if first_seen:
+        elapsed = max(0, now - first_seen)
+        days, rem_seconds = divmod(elapsed, 86400)
+        hours = rem_seconds // 3600
+        time_in_bot_line = f"● Время в боте: {days}д {hours}ч\n"
+    else:
+        time_in_bot_line = ""
+
+    # Усложнение игры — итоговый множитель порога уровня от эво+перерождений (см. level_threshold),
+    # показывается как проценты сверх базовой сложности (100% = без усложнения = +0%).
+    evo_extra = EVO_HARDNESS_RATE * evolution_level
+    rebirth_extra = REBIRTH_HARDNESS_STEP * rebirth_count
+    if active_items and "paradox_charm" in set(_normalize_active_items(active_items)):
+        evo_extra *= 0.5
+        rebirth_extra *= 0.5
+    hardness_pct = round(((1 + evo_extra) * (1 + rebirth_extra) - 1) * 100)
+    hardness_line = f"● Усложнение игры: +{hardness_pct}%\n" if hardness_pct else ""
+
+    # До следующего бонуса — на основе last_bonus/DAILY_MIN_GAP (тот же интервал, что и в
+    # команде "бонус").
+    bonus_wait = DAILY_MIN_GAP - (now - last_bonus)
+    if bonus_wait > 0:
+        bh, bonus_rem = divmod(bonus_wait, 3600)
+        bm = bonus_rem // 60
+        next_bonus_line = f"● До следующего бонуса осталось {bh} часов {bm} минут\n"
+    else:
+        next_bonus_line = "● Бонус уже доступен — напиши «бонус»!\n"
+
     text = (
         f"👣 <b>ТВОЯ ЛЮТАЯ НОГОСТЬ, {esc(shown_name)}:</b>\n"
         f"━━━━━━━━━━━━━━━━━━\n"
+        f"{title_line}"
         f"{ultra_line}"
         f"● Очки: <code>{score}</code>\n"
         f"● Монеты: <code>{coins}</code> 🪙\n"
@@ -5793,8 +6147,13 @@ async def my_profile(message: Message):
         f"● Процентовый буст: +{round((mult - 1) * 100)}%\n"
         f"{guarant_line}"
         f"{vip_line}"
+        f"{time_in_bot_line}"
+        f"● Кейсов открыто: {cases_opened}\n"
+        f"{hardness_line}"
+        f"● Предметов скрафчено: {crafts_done}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"● {nxt}"
+        f"● {nxt}\n"
+        f"{next_bonus_line}"
     )
     await message.reply(text)
 
@@ -5822,7 +6181,10 @@ async def info_player(message: Message):
     ultra_rebirth = bool(row[21]) if len(row) > 21 else False
     bonus_streak = row[10] if len(row) > 10 else 0
     prestige_points = row[27] if len(row) > 27 else 0
+    craft_points = row[32] if len(row) > 32 else 0
     crafts_done = row[36] if len(row) > 36 else 0
+    active_items = parse_equipped(row[18]) if len(row) > 18 else []
+    first_seen = row[46] if len(row) > 46 else None
     shown_name = display_name(username, nickname)
     vip_active = is_vip_active(vip_until)
     level = get_level_index(score, evolution_level, rebirth_count, ultra_rebirth)
@@ -5840,13 +6202,44 @@ async def info_player(message: Message):
         if (gold_coin or diamond_coin) else ""
     )
 
+    titles = get_active_titles(row)
+    if is_developer_id(row[0]):
+        titles.add("developer")
+    display_title = get_display_title(titles)
+    title_line = f"● Титул: {title_emoji_badge(display_title)} {esc(TITLE_LABELS[display_title])}\n" if display_title != "player" else ""
+
+    rebirth_line = f"● Перерождений: {rebirth_count} (🉑 {rebirth_points}) (💠 {craft_points})\n" if rebirth_count else ""
+
+    now = int(time.time())
+    if first_seen:
+        elapsed = max(0, now - first_seen)
+        days, rem_seconds = divmod(elapsed, 86400)
+        hours = rem_seconds // 3600
+        time_in_bot_line = f"● Время в боте: {days}д {hours}ч\n"
+    else:
+        time_in_bot_line = ""
+
+    evo_extra = EVO_HARDNESS_RATE * evolution_level
+    rebirth_extra = REBIRTH_HARDNESS_STEP * rebirth_count
+    if active_items and "paradox_charm" in set(_normalize_active_items(active_items)):
+        evo_extra *= 0.5
+        rebirth_extra *= 0.5
+    hardness_pct = round(((1 + evo_extra) * (1 + rebirth_extra) - 1) * 100)
+    hardness_line = f"● Усложнение игры: +{hardness_pct}%\n" if hardness_pct else ""
+
     text = (
         f"👣 <b>Инфо об игроке {esc(shown_name)}{badges}:</b>\n"
+        f"{title_line}"
         f"● Нога: {emoji}{name_part}{lvl_part}\n"
         f"● Очки: <code>{score}</code>\n"
         f"● Монеты: <code>{coins}</code> 🪙\n"
         f"{premium_coins_line}"
         f"● Уровень эволюции: {evolution_level}\n"
+        f"{rebirth_line}"
+        f"{time_in_bot_line}"
+        f"● Кейсов открыто: {cases_opened}\n"
+        f"{hardness_line}"
+        f"● Предметов скрафчено: {crafts_done}\n"
         f"● VIP: {vip_text}"
     )
     await message.reply(text)
@@ -5937,7 +6330,7 @@ async def cmd_ban_player(message: Message):
     if chat.type not in ("group", "supergroup"):
         await message.reply(TEXTS["cmd_ban_player_1"])
         return
-    if not is_admin(message):
+    if not await is_moderator_or_above(message):
         await message.reply(TEXTS["cmd_ban_player_2"])
         return
 
@@ -5979,7 +6372,7 @@ async def cmd_unban_player(message: Message):
     if chat.type not in ("group", "supergroup"):
         await message.reply(TEXTS["cmd_ban_player_1"])
         return
-    if not is_admin(message):
+    if not await is_moderator_or_above(message):
         await message.reply(TEXTS["cmd_ban_player_2"])
         return
 
@@ -6266,6 +6659,12 @@ async def farm(message: Message):
         gained *= 2
         echo_text = "✨ Эхо фарма: x2!"
 
+    content_boost_until = row[50] if len(row) > 50 else 0
+    content_boost_text = ""
+    if content_boost_until and content_boost_until > now:
+        gained = round(gained * CONTENT_BOOST_MULT)
+        content_boost_text = f"⚡ Буст x{CONTENT_BOOST_MULT:g}!"
+
     gained, nogost_coin_text = apply_coin_tree_farm_roll(gained, active_items)
     new_score = score + gained
 
@@ -6330,12 +6729,17 @@ async def farm(message: Message):
 
     coin_text = f" +{bonus['coins']}🪙" if bonus["coins"] else ""
     rebirth_farm_text = f"🧪🉑 +{bonus['rebirth']}🉑" if (bonus["rebirth"] and not bonus["is_god"]) else ""
-    combo_bits = [b for b in (vase_text, *potion_bits, rebirth_coin_text, rebirth_farm_text, echo_text) if b]
+    combo_bits = [b for b in (vase_text, *potion_bits, rebirth_coin_text, rebirth_farm_text, echo_text, content_boost_text) if b]
     combo_text = ("\n" + " · ".join(combo_bits)) if combo_bits else ""
     bonus_text = "" if compact_mode else (combo_text + chaos_text + chronos_text + coin_tree_text + pocket_star_text + necklace_text + craft_charm_text + mastery_text)
     kotyara_combo_text = f"\n{kotyara_text}" if kotyara_text else ""
     extra_text = bonus_text + auto_evo_text + auto_rebirth_text + kotyara_combo_text
     chronos_equipped = "chronos_orb" in set(_normalize_active_items(active_items))
+
+    content_override_text = content_bonus_text_override(active_items)
+    if content_override_text:
+        await message.reply(content_override_text)
+        return
 
     if bonus["is_god"]:
         flavor = CHRONOS_ORB_FLAVOR if chronos_equipped else GOD_ESSENCE_FLAVOR
@@ -6396,6 +6800,192 @@ async def daily_bonus(message: Message):
 
     await maybe_announce_levelup(message, username, score, new_score, evolution_level, bool(levelup_notify))
     await message.reply(TEXTS["daily_bonus_2"].format(v0=streak, v1=reward, v2=new_score, v3=item_text))
+
+# ==== Ютубер/Тиктокер команды (см. система титулов) ====
+CONTENT_RESET_COOLDOWN = 20 * 60
+CONTENT_BOOST_COOLDOWN = 30 * 60
+CONTENT_BOOST_DURATION = 5 * 60
+CONTENT_BOOST_MULT = 2.0
+CONTENT_SPEEDUP_COOLDOWN = 8 * 3600
+CONTENT_BONUS_COOLDOWN = 24 * 3600
+
+CONTENT_RESET_ALIASES = {
+    "кд": "cd", "фарм": "cd", "ферма": "cd",
+    "эво": "evo", "эволюция": "evo", "эволюции": "evo",
+    "перерождение": "rebirth", "перерождения": "rebirth", "перерождений": "rebirth",
+}
+
+@dp.message(F.text.regexp(r"(?i)^\?сброс\s+(\S+)$"))
+async def content_reset(message: Message):
+    role = await get_content_role(message)
+    if not role:
+        return
+    match = re.match(r"(?i)^\?сброс\s+(\S+)$", message.text.strip())
+    arg = match.group(1).lower()
+    reset_kind = CONTENT_RESET_ALIASES.get(arg)
+    if not reset_kind:
+        await message.reply("Формат: ?сброс кд / ?сброс эво / ?сброс перерождение")
+        return
+
+    user_id = message.from_user.id
+    username = message.from_user.username or message.from_user.first_name or "Без имени"
+    row = await ensure_user(user_id, username)
+
+    if not is_developer(message):
+        now = int(time.time())
+        last_used = row[48] if len(row) > 48 else 0  # content_reset_last
+        wait_left = CONTENT_RESET_COOLDOWN - (now - last_used)
+        if wait_left > 0:
+            wm, ws = divmod(wait_left, 60)
+            await message.reply(f"КД на «?сброс»: подожди ещё {wm} мин {ws} сек.")
+            return
+        await db_exec("UPDATE users SET content_reset_last = ? WHERE user_id = ?", (now, user_id))
+
+    if reset_kind == "cd":
+        await db_exec("UPDATE users SET last_farm = 0 WHERE user_id = ?", (user_id,))
+        await message.reply("⏱️ Кулдаун фермы сброшен!")
+    elif reset_kind == "evo":
+        old_evo = row[3]
+        await db_exec("UPDATE users SET evolution_level = 0 WHERE user_id = ?", (user_id,))
+        await message.reply(f"🌑 Эволюция сброшена: {old_evo} → 0 (усложнение снято).")
+    elif reset_kind == "rebirth":
+        old_rebirth = row[15]
+        await db_exec("UPDATE users SET rebirth_count = 0 WHERE user_id = ?", (user_id,))
+        await message.reply(f"🌘 Перерождения сброшены: {old_rebirth} → 0 (усложнение снято).")
+
+@dp.message(F.text.lower() == "?буст")
+async def content_boost(message: Message):
+    role = await get_content_role(message)
+    if not role:
+        return
+
+    user_id = message.from_user.id
+    username = message.from_user.username or message.from_user.first_name or "Без имени"
+    row = await ensure_user(user_id, username)
+    now = int(time.time())
+
+    if not is_developer(message):
+        last_used = row[49] if len(row) > 49 else 0  # content_boost_last
+        wait_left = CONTENT_BOOST_COOLDOWN - (now - last_used)
+        if wait_left > 0:
+            wm, ws = divmod(wait_left, 60)
+            await message.reply(f"КД на «?буст»: подожди ещё {wm} мин {ws} сек.")
+            return
+        await db_exec("UPDATE users SET content_boost_last = ? WHERE user_id = ?", (now, user_id))
+
+    until = now + CONTENT_BOOST_DURATION
+    await db_exec("UPDATE users SET content_boost_until = ? WHERE user_id = ?", (until, user_id))
+    await message.reply(f"⚡ Буст x{CONTENT_BOOST_MULT:g} активирован на {CONTENT_BOOST_DURATION // 60} минут!")
+
+CONTENT_SPEEDUP_ALIASES = {
+    "зелье": "potion", "зелья": "potion",
+    "бонус": "bonus",
+}
+
+@dp.message(F.text.regexp(r"(?i)^\?ускорение\s+(\S+)$"))
+async def content_speedup(message: Message):
+    role = await get_content_role(message)
+    if not role:
+        return
+    match = re.match(r"(?i)^\?ускорение\s+(\S+)$", message.text.strip())
+    arg = match.group(1).lower()
+    kind = CONTENT_SPEEDUP_ALIASES.get(arg)
+    if not kind:
+        await message.reply("Формат: ?ускорение зелье / ?ускорение бонус")
+        return
+
+    user_id = message.from_user.id
+    username = message.from_user.username or message.from_user.first_name or "Без имени"
+    row = await ensure_user(user_id, username)
+    now = int(time.time())
+
+    if not is_developer(message):
+        last_used = row[51] if len(row) > 51 else 0  # content_speedup_last
+        wait_left = CONTENT_SPEEDUP_COOLDOWN - (now - last_used)
+        if wait_left > 0:
+            wh, wrem = divmod(wait_left, 3600)
+            wm = wrem // 60
+            await message.reply(f"КД на «?ускорение»: подожди ещё {wh} ч {wm} мин.")
+            return
+
+    if kind == "potion":
+        brewing_potion, brewing_until = row[24], row[25]
+        if not brewing_potion or brewing_until <= now:
+            await message.reply("Сейчас ничего не варится — нечего ускорять.")
+            return
+        await db_exec("UPDATE users SET brewing_until = 0 WHERE user_id = ?", (user_id,))
+        cfg = POTIONS[brewing_potion]
+        await message.reply(f"⚡ Варка {cfg['emoji']} {esc(cfg['name'])} завершена мгновенно!")
+    elif kind == "bonus":
+        last_bonus = row[9]
+        if now - last_bonus >= DAILY_MIN_GAP:
+            await message.reply("Бонус уже доступен — напиши «бонус», ускорять нечего.")
+            return
+        await db_exec("UPDATE users SET last_bonus = ? WHERE user_id = ?", (now - DAILY_MIN_GAP, user_id))
+        await message.reply("⚡ Ежедневный бонус готов — напиши «бонус»!")
+
+    if not is_developer(message):
+        await db_exec("UPDATE users SET content_speedup_last = ? WHERE user_id = ?", (now, user_id))
+
+CONTENT_BONUS_REWARDS = [
+    ("legs", 2_500_000_000, "🦵 {v} очков ног"),
+    ("coin", 500_000, "🪙 {v} монет"),
+    ("rebirth", 2_500, "🉑 {v} очков перерождения"),
+    ("prestige", 2_500, "🔮 {v} очков престижа"),
+]
+CONTENT_BONUS_ITEM_CHANCE = 0.025
+
+@dp.message(F.text.lower() == "?бонус")
+async def content_bonus(message: Message):
+    role = await get_content_role(message)
+    if not role:
+        return
+
+    user_id = message.from_user.id
+    username = message.from_user.username or message.from_user.first_name or "Без имени"
+    row = await ensure_user(user_id, username)
+    now = int(time.time())
+
+    if not is_developer(message):
+        last_used = row[52] if len(row) > 52 else 0  # content_bonus_last
+        wait_left = CONTENT_BONUS_COOLDOWN - (now - last_used)
+        if wait_left > 0:
+            wh, wrem = divmod(wait_left, 3600)
+            wm = wrem // 60
+            await message.reply(f"КД на «?бонус»: подожди ещё {wh} ч {wm} мин.")
+            return
+        await db_exec("UPDATE users SET content_bonus_last = ? WHERE user_id = ?", (now, user_id))
+
+    reward_type, amount, label_fmt = random.choice(CONTENT_BONUS_REWARDS)
+    column = {"legs": "score", "coin": "coins", "rebirth": "rebirth_points", "prestige": "prestige_points"}[reward_type]
+    await db_exec(f"UPDATE users SET {column} = {column} + ? WHERE user_id = ?", (amount, user_id))
+    reward_text = label_fmt.format(v=amount)
+
+    item_text = ""
+    if random.random() < CONTENT_BONUS_ITEM_CHANCE:
+        item_key = "youtube_button" if role == "youtuber" else "tiktok_legend"
+        await add_item(user_id, item_key)
+        emoji, name, percent, _ = ITEMS[item_key]
+        item_text = f"\n✨ Плюс бустер {emoji} {esc(name)} (+{percent}%) в инвентарь!"
+
+    await message.reply(f"🎁 Бонус за контент: +{reward_text}!{item_text}")
+
+CONTENT_HELP_TEXT = (
+    "📋 <b>Команды для контент-мейкеров</b>\n"
+    "● ?сброс кд / эво / перерождение — сбрасывает кулдаун фермы или усложнение (КД 20 мин)\n"
+    "● ?буст — буст x2 на 5 минут (КД 30 мин)\n"
+    "● ?ускорение зелье / бонус — мгновенно завершает варку зелья или ежедневный бонус (КД 8 ч)\n"
+    "● ?бонус — случайная награда: ноги, монеты, очкп или престиж, и небольшой шанс на "
+    "уникальный бустер (КД 24 ч)\n"
+    "● ?хелп / ?помощь — эта справка"
+)
+
+@dp.message(F.text.lower().in_({"?хелп", "?помощь"}))
+async def content_help(message: Message):
+    role = await get_content_role(message)
+    if not role:
+        return
+    await message.reply(CONTENT_HELP_TEXT)
 
 @dp.message(F.text.regexp(REVERSE_EXCHANGE_RE))
 async def reverse_exchange(message: Message):
@@ -9200,7 +9790,7 @@ async def help_command(message: Message, query: str):
 
 @dp.message(F.text.lower().startswith("!дать очкп"))
 async def admin_give_rebirth(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_REBIRTH_RE.match(message.text.strip())
@@ -9217,6 +9807,10 @@ async def admin_give_rebirth(message: Message):
     if not amount or amount <= 0:
         await message.reply(TEXTS["admin_give_rebirth_3"])
         return
+    gate_err = await admin_role_gate(message, currency="очкп", amount=amount)
+    if gate_err:
+        await message.reply(gate_err)
+        return
     target_username = target.username or target.first_name or "Без имени"
 
     row = await ensure_user(target.id, target_username)
@@ -9226,7 +9820,7 @@ async def admin_give_rebirth(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!дать (?:крафт|очкк)\b"))
 async def admin_give_craft(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_CRAFT_RE.match(message.text.strip())
@@ -9242,6 +9836,10 @@ async def admin_give_craft(message: Message):
     amount = parse_amount(match.group(1))
     if not amount or amount <= 0:
         await message.reply("Некорректное количество.")
+        return
+    gate_err = await admin_role_gate(message, currency="очкк", amount=amount)
+    if gate_err:
+        await message.reply(gate_err)
         return
     target_username = target.username or target.first_name or "Без имени"
 
@@ -9283,7 +9881,7 @@ async def admin_take_craft(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!дать (?:гкоин|голдкоин)\b"))
 async def admin_give_gold_coin(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_GOLD_COIN_RE.match(message.text.strip())
@@ -9299,6 +9897,10 @@ async def admin_give_gold_coin(message: Message):
     amount = parse_amount(match.group(1))
     if not amount or amount <= 0:
         await message.reply("Некорректное количество.")
+        return
+    gate_err = await admin_role_gate(message, currency="гкоин", amount=amount)
+    if gate_err:
+        await message.reply(gate_err)
         return
     target_username = target.username or target.first_name or "Без имени"
 
@@ -9342,7 +9944,7 @@ async def admin_take_gold_coin(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!дать (?:акоин|алмкоин|алмазкоин)\b"))
 async def admin_give_diamond_coin(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_DIAMOND_COIN_RE.match(message.text.strip())
@@ -9358,6 +9960,10 @@ async def admin_give_diamond_coin(message: Message):
     amount = parse_amount(match.group(1))
     if not amount or amount <= 0:
         await message.reply("Некорректное количество.")
+        return
+    gate_err = await admin_role_gate(message, currency="акоин", amount=amount)
+    if gate_err:
+        await message.reply(gate_err)
         return
     target_username = target.username or target.first_name or "Без имени"
 
@@ -9401,7 +10007,7 @@ async def admin_take_diamond_coin(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!дать престиж\b"))
 async def admin_give_prestige(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_PRESTIGE_RE.match(message.text.strip())
@@ -9417,6 +10023,10 @@ async def admin_give_prestige(message: Message):
     amount = parse_amount(match.group(1))
     if not amount or amount <= 0:
         await message.reply("Некорректное количество.")
+        return
+    gate_err = await admin_role_gate(message, currency="престиж", amount=amount)
+    if gate_err:
+        await message.reply(gate_err)
         return
     target_username = target.username or target.first_name or "Без имени"
 
@@ -9524,7 +10134,7 @@ async def broadcast_news(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!дать ног(?!и лвл)"))
 async def admin_give_legs(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_LEGS_RE.match(message.text.strip())
@@ -9540,6 +10150,10 @@ async def admin_give_legs(message: Message):
     amount = parse_amount(match.group(1))
     if not amount or amount <= 0:
         await message.reply(TEXTS["admin_give_legs_3"])
+        return
+    gate_err = await admin_role_gate(message, currency="ноги", amount=amount)
+    if gate_err:
+        await message.reply(gate_err)
         return
     target_username = target.username or target.first_name or "Без имени"
 
@@ -9584,7 +10198,7 @@ async def admin_take_legs(message: Message):
 
 @dp.message(F.text.lower().startswith("!дать эво"))
 async def admin_give_evo(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_EVO_RE.match(message.text.strip())
@@ -9600,6 +10214,10 @@ async def admin_give_evo(message: Message):
     amount = parse_amount(match.group(1))
     if not amount or amount <= 0:
         await message.reply(TEXTS["admin_give_evo_3"])
+        return
+    gate_err = await admin_role_gate(message, currency="эво", amount=amount)
+    if gate_err:
+        await message.reply(gate_err)
         return
     target_username = target.username or target.first_name or "Без имени"
 
@@ -9643,7 +10261,7 @@ async def admin_take_evo(message: Message):
 
 @dp.message(F.text.lower().startswith("!дать коин"))
 async def admin_give_coin(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_COIN_RE.match(message.text.strip())
@@ -9659,6 +10277,10 @@ async def admin_give_coin(message: Message):
     amount = parse_amount(match.group(1))
     if not amount or amount <= 0:
         await message.reply(TEXTS["admin_give_coin_3"])
+        return
+    gate_err = await admin_role_gate(message, currency="коин", amount=amount)
+    if gate_err:
+        await message.reply(gate_err)
         return
     target_username = target.username or target.first_name or "Без имени"
 
@@ -9702,7 +10324,7 @@ async def admin_take_coin(message: Message):
 
 @dp.message(F.text.lower().startswith("!дать б "))
 async def admin_give_boost(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_BOOST_RE.match(message.text.strip())
@@ -9720,6 +10342,10 @@ async def admin_give_boost(message: Message):
         await message.reply(TEXTS["admin_give_boost_3"])
         return
 
+    gate_err = await admin_role_gate(message)
+    if gate_err:
+        await message.reply(gate_err)
+        return
     target_username = target.username or target.first_name or "Без имени"
     await ensure_user(target.id, target_username)
     await add_item(target.id, item_key)
@@ -9759,7 +10385,7 @@ async def admin_take_boost(message: Message):
 
 @dp.message(F.text.lower().startswith("!дать п "))
 async def admin_give_passive(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_ITEM_RE.match(message.text.strip())
@@ -9777,6 +10403,10 @@ async def admin_give_passive(message: Message):
         await message.reply(TEXTS["admin_give_passive_3"])
         return
 
+    gate_err = await admin_role_gate(message)
+    if gate_err:
+        await message.reply(gate_err)
+        return
     target_username = target.username or target.first_name or "Без имени"
     await ensure_user(target.id, target_username)
     await add_item(target.id, item_key)
@@ -9868,6 +10498,89 @@ async def admin_take_vip(message: Message):
 
     await message.reply(TEXTS["admin_take_vip_3"].format(v0=esc(target_username)))
 
+# ==== Команда выдачи титулов — ДОСТУПНА ТОЛЬКО Разработчику (is_developer), даже админы и
+# модераторы не могут выдавать титулы себе или другим. ====
+TITLE_GIVE_ALIASES = {
+    "премиум": ("premium", None),
+    "модератор": (None, "moderator"),
+    "админ": (None, "admin"),
+    "тиктокер": (None, "tiktoker"),
+    "ютубер": (None, "youtuber"),
+}
+# первое значение пары: если это content_role, второе: если это admin_role. "premium" — особый
+# случай (пишем в is_premium_title, а не в одну из двух ролевых колонок) — обрабатывается отдельно.
+
+@dp.message(F.text.regexp(ADMIN_GIVE_TITLE_RE))
+async def admin_give_title(message: Message):
+    if not is_developer(message):
+        return
+    await log_admin_action(message)
+    match = ADMIN_GIVE_TITLE_RE.match(message.text.strip())
+    title_word = match.group(1).lower()
+    if title_word not in TITLE_GIVE_ALIASES:
+        await message.reply(
+            "Формат: !дать титул <название> (в ответ на сообщение игрока). "
+            "Доступные названия: премиум, модератор, админ, тиктокер, ютубер."
+        )
+        return
+
+    target = await resolve_target(message, bool(match.group(2)))
+    if not target:
+        await message.reply("Ответь этой командой на сообщение игрока, либо допиши «себе».")
+        return
+    target_username = target.username or target.first_name or "Без имени"
+    await ensure_user(target.id, target_username)
+
+    if title_word == "премиум":
+        await db_exec("UPDATE users SET is_premium_title = 1 WHERE user_id = ?", (target.id,))
+        await message.reply(f"Титул «Премиум» выдан игроку {esc(target_username)}.")
+        return
+
+    if title_word in ("модератор", "админ"):
+        # admin_role взаимоисключающий — выдача одного автоматически стирает другое (см. ТЗ:
+        # "админ и модератор не могут быть вместе").
+        new_role = "moderator" if title_word == "модератор" else "admin"
+        await db_exec("UPDATE users SET admin_role = ? WHERE user_id = ?", (new_role, target.id))
+        await message.reply(f"Титул «{TITLE_LABELS[new_role]}» выдан игроку {esc(target_username)} (предыдущая админ-роль, если была, снята).")
+        return
+
+    if title_word in ("тиктокер", "ютубер"):
+        # content_role взаимоисключающий по той же логике, что и admin_role.
+        new_role = "tiktoker" if title_word == "тиктокер" else "youtuber"
+        await db_exec("UPDATE users SET content_role = ? WHERE user_id = ?", (new_role, target.id))
+        await message.reply(f"Титул «{TITLE_LABELS[new_role]}» выдан игроку {esc(target_username)} (предыдущая контент-роль, если была, снята).")
+        return
+
+@dp.message(F.text.regexp(ADMIN_TAKE_TITLE_RE))
+async def admin_take_title(message: Message):
+    if not is_developer(message):
+        return
+    await log_admin_action(message)
+    match = ADMIN_TAKE_TITLE_RE.match(message.text.strip())
+    title_word = match.group(1).lower()
+    if title_word not in TITLE_GIVE_ALIASES:
+        await message.reply(
+            "Формат: !снять титул <название> (в ответ на сообщение игрока). "
+            "Доступные названия: премиум, модератор, админ, тиктокер, ютубер."
+        )
+        return
+
+    target = await resolve_target(message, bool(match.group(2)))
+    if not target:
+        await message.reply("Ответь этой командой на сообщение игрока, либо допиши «себе».")
+        return
+    target_username = target.username or target.first_name or "Без имени"
+    await ensure_user(target.id, target_username)
+
+    if title_word == "премиум":
+        await db_exec("UPDATE users SET is_premium_title = 0 WHERE user_id = ?", (target.id,))
+    elif title_word in ("модератор", "админ"):
+        await db_exec("UPDATE users SET admin_role = '' WHERE user_id = ?", (target.id,))
+    elif title_word in ("тиктокер", "ютубер"):
+        await db_exec("UPDATE users SET content_role = '' WHERE user_id = ?", (target.id,))
+
+    await message.reply(f"Титул «{title_word.capitalize()}» снят у игрока {esc(target_username)}.")
+
 @dp.message(F.text.lower().startswith("!сбросить"))
 async def admin_reset(message: Message):
     if not is_admin(message):
@@ -9925,8 +10638,10 @@ async def admin_set_legs(message: Message):
 @dp.message(F.text.lower().startswith("!дать ноги лвл"))
 async def admin_give_legs_level(message: Message):
     """Ставит игроку РОВНО указанный уровень ноги (не сырое число очков) — пересчитывает
-    нужный score через level_threshold с учётом его эволюции/перерождений/ultra_rebirth."""
-    if not is_admin(message):
+    нужный score через level_threshold с учётом его эволюции/перерождений/ultra_rebirth.
+    Для роли Админ это "инбаланс"-команда — ограничена только общим КД, отдельного числового
+    лимита на сам уровень в ТЗ не было (в отличие от "!дать ноги", где лимит на очки есть)."""
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_LEGS_LVL_RE.match(message.text.strip())
@@ -9940,6 +10655,10 @@ async def admin_give_legs_level(message: Message):
         return
 
     level = int(match.group(1))
+    gate_err = await admin_role_gate(message)
+    if gate_err:
+        await message.reply(gate_err)
+        return
     target_username = target.username or target.first_name or "Без имени"
 
     row = await ensure_user(target.id, target_username)
@@ -10031,7 +10750,7 @@ async def admin_reset_bonus(message: Message):
 
 @dp.message(F.text.lower().startswith("!дать кейс"))
 async def admin_give_case(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_CASE_RE.match(message.text.strip())
@@ -10054,6 +10773,10 @@ async def admin_give_case(message: Message):
         await message.reply(TEXTS["admin_give_case_2"])
         return
 
+    gate_err = await admin_role_gate(message)
+    if gate_err:
+        await message.reply(gate_err)
+        return
     target_username = target.username or target.first_name or "Без имени"
     await ensure_user(target.id, target_username)
 
@@ -10196,8 +10919,15 @@ async def admin_unshow_all_badges(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!ивент\s+х\d"))
 async def admin_event_custom(message: Message):
-    if not is_admin(message):
+    if not await is_moderator_or_above(message):
         return
+
+    row = await ensure_user(message.from_user.id, message.from_user.username or message.from_user.first_name or "Без имени")
+    admin_role = row[42] if len(row) > 42 else ""
+    is_developer_user = is_developer(message)
+    is_moderator_only = (not is_developer_user) and admin_role == "moderator"
+    is_admin_role_user = (not is_developer_user) and admin_role == "admin"
+
     await log_admin_action(message)
     match = ADMIN_EVENT_CUSTOM_RE.match(message.text.strip())
     if not match:
@@ -10209,6 +10939,48 @@ async def admin_event_custom(message: Message):
     if mult <= 0 or minutes <= 0:
         await message.reply(TEXTS["admin_event_custom_2"])
         return
+
+    if is_moderator_only:
+        # Ограничения роли Модератор: макс x5 на 30 минут, КД на использование 4 часа.
+        MODERATOR_EVENT_MAX_MULT = 5
+        MODERATOR_EVENT_MAX_MINUTES = 30
+        MODERATOR_EVENT_COOLDOWN = 4 * 3600
+        now = int(time.time())
+        last_used = row[47] if len(row) > 47 else 0
+        wait_left = MODERATOR_EVENT_COOLDOWN - (now - last_used)
+        if wait_left > 0:
+            wh, wrem = divmod(wait_left, 3600)
+            wm = wrem // 60
+            await message.reply(f"КД на «!ивент» для модератора: подожди ещё {wh} ч {wm} мин.")
+            return
+        if mult > MODERATOR_EVENT_MAX_MULT:
+            await message.reply(f"Модератору доступен буст не выше x{MODERATOR_EVENT_MAX_MULT}.")
+            return
+        if minutes > MODERATOR_EVENT_MAX_MINUTES:
+            await message.reply(f"Модератору доступна длительность ивента не больше {MODERATOR_EVENT_MAX_MINUTES} минут.")
+            return
+        await db_exec("UPDATE users SET moderator_event_last = ? WHERE user_id = ?", (now, message.from_user.id))
+    elif is_admin_role_user:
+        # Ограничения роли Админ: макс x15, макс 3 часа (180 минут), общий КД на ивент — 2 часа
+        # (отдельный от общего КД !дать-команд — тот КД не трогаем здесь).
+        ADMIN_EVENT_MAX_MULT = 15
+        ADMIN_EVENT_MAX_MINUTES = 180
+        ADMIN_EVENT_COOLDOWN = 2 * 3600
+        now = int(time.time())
+        last_used = row[47] if len(row) > 47 else 0
+        wait_left = ADMIN_EVENT_COOLDOWN - (now - last_used)
+        if wait_left > 0:
+            wh, wrem = divmod(wait_left, 3600)
+            wm = wrem // 60
+            await message.reply(f"КД на «!ивент» для админа: подожди ещё {wh} ч {wm} мин.")
+            return
+        if mult > ADMIN_EVENT_MAX_MULT:
+            await message.reply(f"Админу доступен буст не выше x{ADMIN_EVENT_MAX_MULT}.")
+            return
+        if minutes > ADMIN_EVENT_MAX_MINUTES:
+            await message.reply(f"Админу доступна длительность ивента не больше {ADMIN_EVENT_MAX_MINUTES} минут (3 часа).")
+            return
+        await db_exec("UPDATE users SET moderator_event_last = ? WHERE user_id = ?", (now, message.from_user.id))
 
     until = int(time.time()) + minutes * 60
     for key, value in (("event_active", "1"), ("event_multiplier", str(mult)), ("event_until", str(until))):
@@ -10302,7 +11074,7 @@ async def admin_personal_boost(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!дать предмет\s+"))
 async def admin_give_item(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_ITEM_RE.match(message.text.strip())
@@ -10324,6 +11096,10 @@ async def admin_give_item(message: Message):
         await message.reply(TEXTS["admin_give_item_2"])
         return
 
+    gate_err = await admin_role_gate(message)
+    if gate_err:
+        await message.reply(gate_err)
+        return
     target_username = target.username or target.first_name or "Без имени"
     await ensure_user(target.id, target_username)
     await add_item(target.id, item_key, count)
@@ -10333,6 +11109,8 @@ async def admin_give_item(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!дать ключ\s+"))
 async def admin_give_key(message: Message):
+    # ТЗ: "блок к выдаче через ключ" — эта команда для роли Админ полностью недоступна
+    # (в отличие от !дать предмет, которая доступна с общим КД); только Разработчик.
     if not is_admin(message):
         return
     await log_admin_action(message)
@@ -10510,7 +11288,7 @@ async def admin_list_vip(message: Message):
 
 @dp.message(F.text.lower() == "!список ников")
 async def admin_list_nicknames(message: Message):
-    if not is_admin(message):
+    if not await is_moderator_or_above(message):
         return
     await log_admin_action(message)
     rows = await db_query(
@@ -10525,7 +11303,7 @@ async def admin_list_nicknames(message: Message):
 
 @dp.message(F.text.regexp(r"(?i)^!найти\s+"))
 async def admin_find(message: Message):
-    if not is_admin(message):
+    if not await is_moderator_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_FIND_RE.match(message.text.strip())
@@ -10559,8 +11337,9 @@ async def admin_give_all(message: Message):
     """!дать всё [себе] — выдаёт целевому игроку все существующие предметы, бустеры
     (все ключи ITEMS, без исключений) и все зелья (все ключи POTIONS) по 1 штуке каждого.
     Полезно для тестирования — например прогона «помощь бустер/предмет/зелье» по реальному
-    инвентарю."""
-    if not is_admin(message):
+    инвентарю. Для роли Админ это "инбаланс"-команда — ограничена только общим КД (ТЗ:
+    "другие очень инбаланс команды надо ограничить хотя бы КД"), числового лимита тут нет."""
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = ADMIN_GIVE_ALL_RE.match(message.text.strip())
@@ -10569,6 +11348,10 @@ async def admin_give_all(message: Message):
         await message.reply(TEXTS["admin_give_all_1"])
         return
 
+    gate_err = await admin_role_gate(message)
+    if gate_err:
+        await message.reply(gate_err)
+        return
     target_username = target.username or target.first_name or "Без имени"
     row = await ensure_user(target.id, target_username)
 
@@ -10696,7 +11479,7 @@ async def admin_list_chats(message: Message):
     метода 'дай все чаты бота' напрямую). Титул подтягивается свежим через bot.get_chat();
     если чат недоступен (бота уже выгнали), запись пропускается, а не показывается мёртвой
     строкой — так список честно отражает чаты, где бот РЕАЛЬНО сейчас состоит."""
-    if not is_admin(message):
+    if not await is_moderator_or_above(message):
         return
     await log_admin_action(message)
 
@@ -10723,7 +11506,7 @@ async def admin_promo_create_badge(message: Message):
     !промокод создать бейдж "название_бейджа" "название_промокода".
     Зарегистрирован раньше admin_promo_create и матчится первым — aiogram
     останавливается на первом сработавшем хендлере для одного сообщения."""
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = PROMO_CREATE_BADGE_RE.match(message.text.strip())
@@ -10739,6 +11522,10 @@ async def admin_promo_create_badge(message: Message):
         await message.reply(TEXTS["promo_create_badge_2"].format(v0=esc(badge_name_raw)))
         return
 
+    gate_err = await admin_role_gate(message)
+    if gate_err:
+        await message.reply(gate_err)
+        return
     existing = await db_query_one("SELECT code FROM promocodes WHERE code = ?", (code,))
     if existing:
         await message.reply(TEXTS["promo_create_badge_3"].format(v0=esc(code)))
@@ -10756,7 +11543,7 @@ async def admin_promo_create_badge(message: Message):
 
 @dp.message(F.text.regexp(r'(?i)^!промокод создать\s+(?!бейдж\s)'))
 async def admin_promo_create(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = PROMO_CREATE_RE.match(message.text.strip())
@@ -10783,6 +11570,15 @@ async def admin_promo_create(message: Message):
         await message.reply(TEXTS["promo_create_4"])
         return
 
+    # Промокод может быть активирован МНОГО раз (activations раз) — суммарная выдача может
+    # оказаться в activations раз больше amount, поэтому лимит для роли Админ проверяем на
+    # amount * activations (худший случай, если все активации будут использованы).
+    limit_key = PROMO_TYPE_TO_ADMIN_LIMIT_KEY.get(reward_type)
+    gate_err = await admin_role_gate(message, currency=limit_key, amount=amount * activations if limit_key else None)
+    if gate_err:
+        await message.reply(gate_err)
+        return
+
     existing = await db_query_one("SELECT code FROM promocodes WHERE code = ?", (code,))
     if existing:
         await message.reply(TEXTS["promo_create_5"].format(v0=esc(code)))
@@ -10805,7 +11601,7 @@ async def admin_promo_create(message: Message):
 
 @dp.message(F.text.regexp(r'(?i)^!промокод удалить\s+'))
 async def admin_promo_delete(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     match = PROMO_DELETE_RE.match(message.text.strip())
@@ -10825,7 +11621,7 @@ async def admin_promo_delete(message: Message):
 
 @dp.message(F.text.lower() == "!промокод список")
 async def admin_promo_list(message: Message):
-    if not is_admin(message):
+    if not await is_admin_role_or_above(message):
         return
     await log_admin_action(message)
     rows = await db_query(
@@ -10931,7 +11727,7 @@ async def admin_top_spam(message: Message):
     слать команды каждые доли секунды подолгу, поэтому маленький минимальный
     интервал при большом числе команд — сигнал на бота/скрипт, а не флуд руками.
     """
-    if not is_admin(message):
+    if not await is_moderator_or_above(message):
         return
     await log_admin_action(message)
 
